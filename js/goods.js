@@ -222,7 +222,7 @@ document.querySelector('.catalog__cards').appendChild(fragmentCatalogCard);
 var goodsInCard = goods.slice(0, 3);
 var fragmentCard = document.createDocumentFragment();
 
-for (var j = 0; j < 3; j++) {
+for (var j = 0; j < goodsInCard.length; j++) {
   fragmentCard.appendChild(
       renderCard(goodsInCard[j])
   );
