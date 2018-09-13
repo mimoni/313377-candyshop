@@ -1,5 +1,16 @@
 'use strict';
 
+var NUMBER_OF_GOODS = 26;
+var IMAGE_PATH = 'img/cards/';
+
+var CARD_CATALOG_TEMPLATE = document.querySelector('#card')
+  .content
+  .querySelector('.catalog__card');
+
+var CARD_TEMPLATE = document.querySelector('#card-order')
+  .content
+  .querySelector('.goods_card');
+
 var names = [
   'Чесночные сливки',
   'Огуречный педант',
@@ -87,8 +98,6 @@ var ratingClassList = [
   'stars__rating--four',
   'stars__rating--five'
 ];
-var NUMBER_OF_GOODS = 26;
-var IMAGE_PATH = 'img/cards/';
 
 // Возвращает случайное целое число между min (включительно) и max (включительно)
 var getRandomInt = function (min, max) {
@@ -130,7 +139,7 @@ var getGoods = function () {
   var items = [];
 
   for (var i = 0; i < NUMBER_OF_GOODS; i++) {
-    var product = {
+    items.push({
       name: names[i],
       picture: IMAGE_PATH + getImageName(),
       amount: getRandomInt(0, 20),
@@ -138,26 +147,14 @@ var getGoods = function () {
       weight: getRandomInt(30, 300),
       rating: getRating(),
       nutritionFacts: getNutritionFacts()
-    };
-
-    items.push(product);
+    });
   }
 
   return items;
 };
 
-var catalogCardsElement = document.querySelector('.catalog__cards');
-catalogCardsElement.classList.remove('catalog__cards--load');
-
-var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
-catalogLoadElement.classList.add('visually-hidden');
-
-var cardCatalogTemplate = document.querySelector('#card')
-  .content
-  .querySelector('.catalog__card');
-
 var renderCatalogCard = function (item) {
-  var cardCatalogElement = cardCatalogTemplate.cloneNode(true);
+  var cardCatalogElement = CARD_CATALOG_TEMPLATE.cloneNode(true);
   var amountClass = '';
 
   if (item.amount === 0) {
@@ -191,12 +188,8 @@ var renderCatalogCard = function (item) {
   return cardCatalogElement;
 };
 
-var cardTemplate = document.querySelector('#card-order')
-  .content
-  .querySelector('.goods_card');
-
 var renderCard = function (item) {
-  var cardElement = cardTemplate.cloneNode(true);
+  var cardElement = CARD_TEMPLATE.cloneNode(true);
 
   cardElement.querySelector('.card-order__title').textContent = item.name;
 
@@ -209,26 +202,48 @@ var renderCard = function (item) {
   return cardElement;
 };
 
-var goods = getGoods();
-var fragmentCatalogCard = document.createDocumentFragment();
+var displayElements = function (elements, containerElements) {
+  var fragment = document.createDocumentFragment();
 
-for (var i = 0; i < goods.length; i++) {
-  fragmentCatalogCard.appendChild(renderCatalogCard(goods[i]));
-}
+  for (var i = 0; i < elements.length; i++) {
+    fragment.appendChild(elements[i]);
+  }
 
-document.querySelector('.catalog__cards').appendChild(fragmentCatalogCard);
+  containerElements.appendChild(fragment);
+};
 
-// добавление в корзину
-var goodsInCard = goods.slice(0, 3);
-var fragmentCard = document.createDocumentFragment();
+var createGoods = function () {
+  var goods = getGoods();
+  var catalogCards = document.querySelector('.catalog__cards');
+  var goodsElements = [];
 
-for (var j = 0; j < goodsInCard.length; j++) {
-  fragmentCard.appendChild(
-      renderCard(goodsInCard[j])
-  );
-}
+  for (var i = 0; i < goods.length; i++) {
+    goodsElements.push(renderCatalogCard(goods[i]));
+  }
 
-var goodsCardsElement = document.querySelector('.goods__cards');
-goodsCardsElement.querySelector('.goods__card-empty').remove();
-goodsCardsElement.classList.remove('goods__cards--empty');
-goodsCardsElement.appendChild(fragmentCard);
+  displayElements(goodsElements, catalogCards);
+};
+
+var createGoodsInCard = function () {
+  var goodsInCard = getGoods().slice(0, 3);
+  var goodsCardsElement = document.querySelector('.goods__cards');
+  var goodsInCardElements = [];
+
+  for (var i = 0; i < goodsInCard.length; i++) {
+    goodsInCardElements.push(renderCard(goodsInCard[i]));
+  }
+
+  displayElements(goodsInCardElements, goodsCardsElement);
+
+  goodsCardsElement.querySelector('.goods__card-empty').remove();
+  goodsCardsElement.classList.remove('goods__cards--empty');
+};
+
+createGoods();
+createGoodsInCard();
+
+var catalogCardsElement = document.querySelector('.catalog__cards');
+catalogCardsElement.classList.remove('catalog__cards--load');
+
+var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
+catalogLoadElement.classList.add('visually-hidden');
