@@ -11,7 +11,7 @@ var cardTemplate = document.querySelector('#card-order')
   .content
   .querySelector('.goods_card');
 var goods = [];
-var goodsInCard = [];
+var goodsInCard = []; // массив id товаров
 var names = [
   'Чесночные сливки',
   'Огуречный педант',
@@ -141,6 +141,8 @@ var getGoods = function () {
 
   for (var i = 0; i < NUMBER_OF_GOODS; i++) {
     items.push({
+      id: i,
+      favorite: false,
       name: names[i],
       picture: IMAGE_PATH + getImageName(),
       amount: getRandomInt(0, 20),
@@ -179,6 +181,14 @@ var renderCatalogCard = function (item) {
 
   cardCatalogElement.querySelector('.star__count').textContent = '(' + item.rating.number + ')';
 
+  var favoriteBtnElement = cardCatalogElement.querySelector('.card__btn-favorite');
+  favoriteBtnElement.dataset.productId = item.id;
+  if (item.favorite) {
+    cardCatalogElement.classList.add('.card__btn-favorite--selected');
+  }
+
+  cardCatalogElement.querySelector('.card__btn').dataset.productId = item.id;
+
   var imgElement = cardCatalogElement.querySelector('.card__img');
   imgElement.src = item.picture;
   imgElement.alt = item.name;
@@ -189,7 +199,7 @@ var renderCatalogCard = function (item) {
   return cardCatalogElement;
 };
 
-var renderCard = function (item) {
+var renderGoodsInCard = function (item) {
   var cardElement = cardTemplate.cloneNode(true);
 
   cardElement.querySelector('.card-order__title').textContent = item.name;
@@ -199,6 +209,10 @@ var renderCard = function (item) {
   imgElement.src = item.picture;
 
   cardElement.querySelector('.card-order__price').textContent = item.price + ' ₽';
+
+  cardElement.querySelector('.card-order__close').dataset.productId = item.id;
+  cardElement.querySelector('.card-order__btn--decrease').dataset.productId = item.id;
+  cardElement.querySelector('.card-order__btn--increase').dataset.productId = item.id;
 
   return cardElement;
 };
@@ -225,13 +239,13 @@ var createGoods = function () {
   displayElements(goodsElements, catalogCards);
 };
 
-var createGoodsInCard = function () {
+var renderCard = function () {
   goodsInCard = goods.slice(0, 3);
   var goodsCardsElement = document.querySelector('.goods__cards');
   var goodsInCardElements = [];
 
   goodsInCard.forEach(function (product) {
-    goodsInCardElements.push(renderCard(product));
+    goodsInCardElements.push(renderGoodsInCard(product));
   });
 
   displayElements(goodsInCardElements, goodsCardsElement);
@@ -248,6 +262,31 @@ var hideCatalogLoadedText = function () {
   catalogLoadElement.classList.add('visually-hidden');
 };
 
+var getProductFromId = function (id) {
+  return goods.find(function (product) {
+    return product.id === parseInt(id, 10);
+  });
+};
+
 hideCatalogLoadedText();
 createGoods();
-createGoodsInCard();
+
+document.querySelector('.catalog__cards').addEventListener('click', function (evt) {
+  var favoriteBtnElement = evt.target;
+
+  // Добавление/удаление в избранное
+  if (favoriteBtnElement.classList.contains('card__btn-favorite')) {
+    evt.preventDefault();
+
+    var product = getProductFromId(favoriteBtnElement.dataset.productId);
+    if (favoriteBtnElement.classList.contains('card__btn-favorite--selected')) {
+      // Удаление из избранного
+      favoriteBtnElement.classList.remove('card__btn-favorite--selected');
+      product.favorite = false;
+    } else {
+      // Добавление в избранное
+      favoriteBtnElement.classList.add('card__btn-favorite--selected');
+      product.favorite = true;
+    }
+  }
+});
