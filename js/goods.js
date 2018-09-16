@@ -3,14 +3,15 @@
 var NUMBER_OF_GOODS = 26;
 var IMAGE_PATH = 'img/cards/';
 
-var CARD_CATALOG_TEMPLATE = document.querySelector('#card')
+var cardCatalogTemplate = document.querySelector('#card')
   .content
   .querySelector('.catalog__card');
 
-var CARD_TEMPLATE = document.querySelector('#card-order')
+var cardTemplate = document.querySelector('#card-order')
   .content
   .querySelector('.goods_card');
-
+var goods = [];
+var goodsInCard = [];
 var names = [
   'Чесночные сливки',
   'Огуречный педант',
@@ -154,7 +155,7 @@ var getGoods = function () {
 };
 
 var renderCatalogCard = function (item) {
-  var cardCatalogElement = CARD_CATALOG_TEMPLATE.cloneNode(true);
+  var cardCatalogElement = cardCatalogTemplate.cloneNode(true);
   var amountClass = '';
 
   if (item.amount === 0) {
@@ -189,7 +190,7 @@ var renderCatalogCard = function (item) {
 };
 
 var renderCard = function (item) {
-  var cardElement = CARD_TEMPLATE.cloneNode(true);
+  var cardElement = cardTemplate.cloneNode(true);
 
   cardElement.querySelector('.card-order__title').textContent = item.name;
 
@@ -202,36 +203,36 @@ var renderCard = function (item) {
   return cardElement;
 };
 
-var displayElements = function (elements, containerElements) {
+var displayElements = function (elements, containerElement) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < elements.length; i++) {
-    fragment.appendChild(elements[i]);
-  }
+  elements.forEach(function (element) {
+    fragment.appendChild(element);
+  });
 
-  containerElements.appendChild(fragment);
+  containerElement.appendChild(fragment);
 };
 
 var createGoods = function () {
-  var goods = getGoods();
+  goods = getGoods();
   var catalogCards = document.querySelector('.catalog__cards');
   var goodsElements = [];
 
-  for (var i = 0; i < goods.length; i++) {
-    goodsElements.push(renderCatalogCard(goods[i]));
-  }
+  goods.forEach(function (product) {
+    goodsElements.push(renderCatalogCard(product));
+  });
 
   displayElements(goodsElements, catalogCards);
 };
 
 var createGoodsInCard = function () {
-  var goodsInCard = getGoods().slice(0, 3);
+  goodsInCard = goods.slice(0, 3);
   var goodsCardsElement = document.querySelector('.goods__cards');
   var goodsInCardElements = [];
 
-  for (var i = 0; i < goodsInCard.length; i++) {
-    goodsInCardElements.push(renderCard(goodsInCard[i]));
-  }
+  goodsInCard.forEach(function (product) {
+    goodsInCardElements.push(renderCard(product));
+  });
 
   displayElements(goodsInCardElements, goodsCardsElement);
 
@@ -239,11 +240,14 @@ var createGoodsInCard = function () {
   goodsCardsElement.classList.remove('goods__cards--empty');
 };
 
+var hideCatalogLoadedText = function () {
+  var catalogCardsElement = document.querySelector('.catalog__cards');
+  catalogCardsElement.classList.remove('catalog__cards--load');
+
+  var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
+  catalogLoadElement.classList.add('visually-hidden');
+};
+
+hideCatalogLoadedText();
 createGoods();
 createGoodsInCard();
-
-var catalogCardsElement = document.querySelector('.catalog__cards');
-catalogCardsElement.classList.remove('catalog__cards--load');
-
-var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
-catalogLoadElement.classList.add('visually-hidden');
