@@ -214,6 +214,7 @@ var renderGoodsInCard = function (item) {
   cardElement.querySelector('.card-order__btn--decrease').dataset.productId = item.id;
   cardElement.querySelector('.card-order__btn--increase').dataset.productId = item.id;
 
+  cardElement.querySelector('.card-order__count').dataset.productId = item.id;
   cardElement.querySelector('.card-order__count').value = goodsInCard[item.id].amount;
 
   return cardElement;
@@ -270,16 +271,16 @@ var renderCart = function () {
   displayElements(goodsInCardElements, goodsCardsElement);
 };
 
-var addProductIdToCart = function (id) {
-  if (id in goodsInCard) {
-    goodsInCard[id].amount += 1;
+var addProductIdToCart = function (productId) {
+  if (productId in goodsInCard) {
+    goodsInCard[productId].amount += 1;
   } else {
-    goodsInCard[id] = {amount: 1};
+    goodsInCard[productId] = {amount: 1};
   }
 };
 
-var removeProductIdFromCart = function (id) {
-  delete goodsInCard[id];
+var removeProductIdFromCart = function (productId) {
+  delete goodsInCard[productId];
 };
 
 var hideCatalogLoadedText = function () {
@@ -330,13 +331,33 @@ document.querySelector('.catalog__cards').addEventListener('click', function (ev
 
 document.querySelector('.goods__cards').addEventListener('click', function (evt) {
   var actionBtnElement = evt.target;
+  var productId = actionBtnElement.dataset.productId;
 
   // Удаление товара из корзины
   if (actionBtnElement.classList.contains('card-order__close')) {
     evt.preventDefault();
 
-    var productId = actionBtnElement.dataset.productId;
     removeProductIdFromCart(productId);
+    renderCart();
+  }
+
+  // Увеличить количество товара в корзине на единицу
+  if (actionBtnElement.classList.contains('card-order__btn--increase')) {
+    evt.preventDefault();
+
+    goodsInCard[productId].amount += 1;
+    renderCart();
+  }
+
+  // Уменьшить  количество товара в корзине на единицу
+  if (actionBtnElement.classList.contains('card-order__btn--decrease')) {
+    evt.preventDefault();
+
+    goodsInCard[productId].amount -= 1;
+
+    if (goodsInCard[productId].amount === 0) {
+      removeProductIdFromCart(productId);
+    }
     renderCart();
   }
 });
