@@ -10,6 +10,8 @@ var cardCatalogTemplate = document.querySelector('#card')
 var cardTemplate = document.querySelector('#card-order')
   .content
   .querySelector('.goods_card');
+
+var headerBasket = document.querySelector('.main-header__basket');
 var goods = [];
 var goodsInCard = {};
 var names = [
@@ -277,6 +279,8 @@ var addProductIdToCart = function (productId) {
   } else {
     goodsInCard[productId] = {orderedAmount: 1};
   }
+
+  headerBasket.textContent = 'В корзине полно вкусняшек';
 };
 
 var reduceProductIdInCart = function (productId) {
@@ -289,6 +293,10 @@ var reduceProductIdInCart = function (productId) {
 
 var removeProductIdFromCart = function (productId) {
   delete goodsInCard[productId];
+
+  if (!Object.keys(goodsInCard).length) {
+    headerBasket.textContent = 'В корзине ничего нет';
+  }
 };
 
 var toggleTabsDelivery = function () {
