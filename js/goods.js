@@ -347,12 +347,7 @@ var getProductFromId = function (id) {
   });
 };
 
-hideCatalogLoadedText();
-createGoods();
-toggleTabsDelivery();
-toggleTabsPayment();
-
-document.querySelector('.catalog__cards').addEventListener('click', function (evt) {
+var productHandler = function (evt) {
   var actionBtnElement = evt.target;
 
   // Добавление/удаление в избранное
@@ -379,9 +374,9 @@ document.querySelector('.catalog__cards').addEventListener('click', function (ev
     addProductIdToCart(productId);
     renderCart();
   }
-});
+};
 
-document.querySelector('.goods__cards').addEventListener('click', function (evt) {
+var cartHandler = function (evt) {
   var actionBtnElement = evt.target;
   var productId = actionBtnElement.dataset.productId;
 
@@ -408,4 +403,13 @@ document.querySelector('.goods__cards').addEventListener('click', function (evt)
     reduceProductIdInCart(productId);
     renderCart();
   }
-});
+};
+
+hideCatalogLoadedText();
+createGoods();
+toggleTabsDelivery();
+toggleTabsPayment();
+
+document.querySelector('.catalog__cards').addEventListener('click', productHandler);
+
+document.querySelector('.goods__cards').addEventListener('click', cartHandler);
