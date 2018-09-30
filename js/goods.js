@@ -405,10 +405,31 @@ var cartHandler = function (evt) {
   }
 };
 
+var priceSlider = function () {
+  var maxPrice = 100;
+  var priceMinEl = document.querySelector('.range__price--min');
+  var priceMaxEl = document.querySelector('.range__price--max');
+  var rangeBtnLeftEl = document.querySelector('.range__btn--left');
+  var rangeBtnRightEl = document.querySelector('.range__btn--right');
+  var getPercentFromRangeBtn = function (el) {
+    var percent = parseFloat(el.style.left);
+    return maxPrice * percent / 100;
+  };
+
+  rangeBtnLeftEl.addEventListener('mouseup', function (evt) {
+    priceMinEl.textContent = getPercentFromRangeBtn(evt.target);
+  });
+
+  rangeBtnRightEl.addEventListener('mouseup', function (evt) {
+    priceMaxEl.textContent = getPercentFromRangeBtn(evt.target);
+  });
+};
+
 hideCatalogLoadedText();
 createGoods();
 toggleTabsDelivery();
 toggleTabsPayment();
+priceSlider();
 
 document.querySelector('.catalog__cards').addEventListener('click', productHandler);
 
