@@ -457,7 +457,7 @@ var cardNumberHandler = function (evt) {
 
   if (cardInput.value.length !== 16) {
     cardInput.setCustomValidity('Номер карты должен состоять из 16 символов');
-    // return;
+    return;
   }
 
   if (checkCardNumber(cardInput.value)) {
