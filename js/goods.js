@@ -302,6 +302,9 @@ var removeProductIdFromCart = function (productId) {
 var toggleTabsDelivery = function () {
   var deliverStore = document.querySelector('.deliver__store');
   var deliverCourier = document.querySelector('.deliver__courier');
+  var inputsStore = document.querySelectorAll('.deliver__store input');
+  var textArea = document.querySelectorAll('.deliver__courier textarea');
+  var inputsCourier = document.querySelectorAll('.deliver__courier input');
 
   document.querySelector('.deliver__toggle').addEventListener('click', function (evt) {
     if (!evt.target.id) {
@@ -313,12 +316,17 @@ var toggleTabsDelivery = function () {
 
     var id = evt.target.id;
     document.querySelector('.' + id).classList.remove('visually-hidden');
+    toggleDisableInputs(inputsStore);
+    toggleDisableInputs(inputsCourier);
+    toggleDisableInputs(textArea);
   });
 };
 
 var toggleTabsPayment = function () {
   var paymentCard = document.querySelector('.payment__card-wrap');
   var paymentCash = document.querySelector('.payment__cash-wrap');
+  var inputs = document.querySelectorAll('.payment__inputs input');
+
 
   document.querySelector('.payment__method').addEventListener('click', function (evt) {
     if (!evt.target.id) {
@@ -330,6 +338,7 @@ var toggleTabsPayment = function () {
 
     var id = evt.target.id;
     document.querySelector('.' + id + '-wrap').classList.remove('visually-hidden');
+    toggleDisableInputs(inputs);
   });
 };
 
@@ -425,6 +434,45 @@ var priceSlider = function () {
   });
 };
 
+var checkCardNumber = function (inputValue) {
+  var numbers = inputValue.split('').map(function (char, index) {
+    var digit = parseInt(char, 10);
+
+    if (index % 2 === 0) {
+      digit *= 2;
+    }
+
+    return digit > 9 ? digit - 9 : digit;
+  });
+
+  var sum = numbers.reduce(function (a, b) {
+    return a + b;
+  }, 0);
+
+  return sum % 10 === 0;
+};
+
+var cardNumberHandler = function (evt) {
+  var cardInput = evt.target;
+
+  if (cardInput.value.length !== 16) {
+    cardInput.setCustomValidity('Номер карты должен состоять из 16 символов');
+    return;
+  }
+
+  if (checkCardNumber(cardInput.value)) {
+    cardInput.setCustomValidity('');
+  } else {
+    cardInput.setCustomValidity('Неверный номер кредитной карты');
+  }
+};
+
+var toggleDisableInputs = function (inputs) {
+  inputs.forEach(function (input) {
+    input.disabled = !input.disabled;
+  });
+};
+
 hideCatalogLoadedText();
 createGoods();
 toggleTabsDelivery();
@@ -434,3 +482,5 @@ priceSlider();
 document.querySelector('.catalog__cards').addEventListener('click', productHandler);
 
 document.querySelector('.goods__cards').addEventListener('click', cartHandler);
+
+document.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
