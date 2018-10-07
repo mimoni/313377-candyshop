@@ -12,6 +12,9 @@ var cardTemplate = document.querySelector('#card-order')
   .querySelector('.goods_card');
 
 var headerBasket = document.querySelector('.main-header__basket');
+var catalogCardsEl = document.querySelector('.catalog__cards');
+var goodsCardsEl = document.querySelector('.goods__cards');
+var formEl = document.querySelector('.buy form');
 var goods = [];
 var goodsInCard = {};
 var names = [
@@ -234,18 +237,16 @@ var displayElements = function (elements, containerElement) {
 
 var createGoods = function () {
   goods = getGoods();
-  var catalogCards = document.querySelector('.catalog__cards');
   var goodsElements = [];
 
   goods.forEach(function (product) {
     goodsElements.push(renderCatalogCard(product));
   });
 
-  displayElements(goodsElements, catalogCards);
+  displayElements(goodsElements, catalogCardsEl);
 };
 
 var renderCart = function () {
-  var goodsCardsElement = document.querySelector('.goods__cards');
   var goodsInCardElements = [];
 
   for (var productId in goodsInCard) {
@@ -263,14 +264,14 @@ var renderCart = function () {
 
   // Если в корзине есть товары, убрать сообщение о пустой корзине
   if (Object.keys(goodsInCard).length) {
-    goodsCardsElement.querySelector('.goods__card-empty').classList.add('visually-hidden');
-    goodsCardsElement.classList.remove('goods__cards--empty');
+    goodsCardsEl.querySelector('.goods__card-empty').classList.add('visually-hidden');
+    goodsCardsEl.classList.remove('goods__cards--empty');
   } else {
-    goodsCardsElement.querySelector('.goods__card-empty').classList.remove('visually-hidden');
-    goodsCardsElement.classList.add('goods__cards--empty');
+    goodsCardsEl.querySelector('.goods__card-empty').classList.remove('visually-hidden');
+    goodsCardsEl.classList.add('goods__cards--empty');
   }
 
-  displayElements(goodsInCardElements, goodsCardsElement);
+  displayElements(goodsInCardElements, goodsCardsEl);
 };
 
 var addProductIdToCart = function (productId) {
@@ -343,10 +344,9 @@ var toggleTabsPayment = function () {
 };
 
 var hideCatalogLoadedText = function () {
-  var catalogCardsElement = document.querySelector('.catalog__cards');
-  catalogCardsElement.classList.remove('catalog__cards--load');
+  catalogCardsEl.classList.remove('catalog__cards--load');
 
-  var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
+  var catalogLoadElement = catalogCardsEl.querySelector('.catalog__load');
   catalogLoadElement.classList.add('visually-hidden');
 };
 
@@ -479,8 +479,8 @@ toggleTabsDelivery();
 toggleTabsPayment();
 priceSlider();
 
-document.querySelector('.catalog__cards').addEventListener('click', productHandler);
+catalogCardsEl.addEventListener('click', productHandler);
 
-document.querySelector('.goods__cards').addEventListener('click', cartHandler);
+goodsCardsEl.addEventListener('click', cartHandler);
 
-document.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
+formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
