@@ -12,6 +12,9 @@ var cardTemplate = document.querySelector('#card-order')
   .querySelector('.goods_card');
 
 var headerBasket = document.querySelector('.main-header__basket');
+var catalogCardsEl = document.querySelector('.catalog__cards');
+var goodsCardsEl = document.querySelector('.goods__cards');
+var formEl = document.querySelector('.buy form');
 var goods = [];
 var goodsInCard = {};
 var names = [
@@ -234,18 +237,16 @@ var displayElements = function (elements, containerElement) {
 
 var createGoods = function () {
   goods = getGoods();
-  var catalogCards = document.querySelector('.catalog__cards');
   var goodsElements = [];
 
   goods.forEach(function (product) {
     goodsElements.push(renderCatalogCard(product));
   });
 
-  displayElements(goodsElements, catalogCards);
+  displayElements(goodsElements, catalogCardsEl);
 };
 
 var renderCart = function () {
-  var goodsCardsElement = document.querySelector('.goods__cards');
   var goodsInCardElements = [];
 
   for (var productId in goodsInCard) {
@@ -263,14 +264,14 @@ var renderCart = function () {
 
   // Если в корзине есть товары, убрать сообщение о пустой корзине
   if (Object.keys(goodsInCard).length) {
-    goodsCardsElement.querySelector('.goods__card-empty').classList.add('visually-hidden');
-    goodsCardsElement.classList.remove('goods__cards--empty');
+    goodsCardsEl.querySelector('.goods__card-empty').classList.add('visually-hidden');
+    goodsCardsEl.classList.remove('goods__cards--empty');
   } else {
-    goodsCardsElement.querySelector('.goods__card-empty').classList.remove('visually-hidden');
-    goodsCardsElement.classList.add('goods__cards--empty');
+    goodsCardsEl.querySelector('.goods__card-empty').classList.remove('visually-hidden');
+    goodsCardsEl.classList.add('goods__cards--empty');
   }
 
-  displayElements(goodsInCardElements, goodsCardsElement);
+  displayElements(goodsInCardElements, goodsCardsEl);
 };
 
 var addProductIdToCart = function (productId) {
@@ -343,10 +344,9 @@ var toggleTabsPayment = function () {
 };
 
 var hideCatalogLoadedText = function () {
-  var catalogCardsElement = document.querySelector('.catalog__cards');
-  catalogCardsElement.classList.remove('catalog__cards--load');
+  catalogCardsEl.classList.remove('catalog__cards--load');
 
-  var catalogLoadElement = catalogCardsElement.querySelector('.catalog__load');
+  var catalogLoadElement = catalogCardsEl.querySelector('.catalog__load');
   catalogLoadElement.classList.add('visually-hidden');
 };
 
@@ -415,22 +415,108 @@ var cartHandler = function (evt) {
 };
 
 var priceSlider = function () {
+  var rangeEl = document.querySelector('.range');
   var maxPrice = 100;
-  var priceMinEl = document.querySelector('.range__price--min');
-  var priceMaxEl = document.querySelector('.range__price--max');
-  var rangeBtnLeftEl = document.querySelector('.range__btn--left');
-  var rangeBtnRightEl = document.querySelector('.range__btn--right');
+  var minXPosition = 0;
+  var rangeWidth = rangeEl.querySelector('.range__filter').offsetWidth;
+  var priceMinEl = rangeEl.querySelector('.range__price--min');
+  var priceMaxEl = rangeEl.querySelector('.range__price--max');
+  var rangePinLeftEl = rangeEl.querySelector('.range__btn--left');
+  var rangePinRightEl = rangeEl.querySelector('.range__btn--right');
+  var pinWidth = rangePinLeftEl.offsetWidth;
+  var rangeFillLineEl = rangeEl.querySelector('.range__fill-line');
   var getPercentFromRangeBtn = function (el) {
-    var percent = parseFloat(el.style.left);
-    return maxPrice * percent / 100;
+    var percent = parseFloat(el.style.left) * 100 / rangeWidth;
+    return Math.round(maxPrice * percent / 100);
   };
 
-  rangeBtnLeftEl.addEventListener('mouseup', function (evt) {
-    priceMinEl.textContent = getPercentFromRangeBtn(evt.target);
+  rangePinLeftEl.addEventListener('mousedown', function (evt) {
+    var startCoordinateX = evt.clientX;
+    var pin = evt.target;
+
+    var mouseMoveHandler = function (moveEvt) {
+      var shiftX = startCoordinateX - moveEvt.clientX;
+
+      startCoordinateX = moveEvt.clientX;
+
+      priceMinEl.textContent = getPercentFromRangeBtn(pin);
+      var newPositionPin = parseInt(pin.style.left, 10) - shiftX;
+
+      var rightLimiter = parseInt(rangePinRightEl.style.left, 10) - pinWidth / 2;
+      if ((newPositionPin > rightLimiter) || (newPositionPin < minXPosition)) {
+        removeEvents();
+        return;
+      }
+
+      pin.style.left = newPositionPin + 'px';
+      rangeFillLineEl.style.left = newPositionPin + 'px';
+    };
+
+    var mouseUpHandler = function () {
+      priceMinEl.textContent = getPercentFromRangeBtn(pin);
+      removeEvents();
+    };
+
+    var mouseOutHandler = function () {
+      removeEvents();
+    };
+
+    var removeEvents = function () {
+      pin.removeEventListener('mouseup', mouseUpHandler);
+      pin.removeEventListener('mousemove', mouseMoveHandler);
+      pin.removeEventListener('mousemove', mouseOutHandler);
+    };
+
+    pin.addEventListener('mouseup', mouseUpHandler);
+
+    pin.addEventListener('mousemove', mouseMoveHandler);
+
+    pin.addEventListener('mouseout', mouseOutHandler);
+
   });
 
-  rangeBtnRightEl.addEventListener('mouseup', function (evt) {
-    priceMaxEl.textContent = getPercentFromRangeBtn(evt.target);
+  rangePinRightEl.addEventListener('mousedown', function (evt) {
+    var startCoordinateX = evt.clientX;
+    var pin = evt.target;
+
+    var mouseMoveHandler = function (moveEvt) {
+      var shiftX = startCoordinateX - moveEvt.clientX;
+
+      startCoordinateX = moveEvt.clientX;
+
+      priceMaxEl.textContent = getPercentFromRangeBtn(pin);
+      var newPositionPin = parseInt(pin.style.left, 10) - shiftX;
+
+      var leftLimiter = Math.abs(parseInt(rangePinLeftEl.style.left, 10) + pinWidth / 2);
+      if ((newPositionPin < leftLimiter) || (newPositionPin > rangeWidth)) {
+        removeEvents();
+        return;
+      }
+
+      pin.style.left = newPositionPin + 'px';
+      rangeFillLineEl.style.right = rangeWidth - newPositionPin + 'px';
+    };
+
+    var mouseUpHandler = function () {
+      priceMaxEl.textContent = getPercentFromRangeBtn(pin);
+      removeEvents();
+    };
+
+    var mouseOutHandler = function () {
+      removeEvents();
+    };
+
+    var removeEvents = function () {
+      pin.removeEventListener('mouseup', mouseUpHandler);
+      pin.removeEventListener('mousemove', mouseMoveHandler);
+      pin.removeEventListener('mousemove', mouseOutHandler);
+    };
+
+    pin.addEventListener('mouseup', mouseUpHandler);
+
+    pin.addEventListener('mousemove', mouseMoveHandler);
+
+    pin.addEventListener('mouseout', mouseOutHandler);
   });
 };
 
@@ -479,8 +565,8 @@ toggleTabsDelivery();
 toggleTabsPayment();
 priceSlider();
 
-document.querySelector('.catalog__cards').addEventListener('click', productHandler);
+catalogCardsEl.addEventListener('click', productHandler);
 
-document.querySelector('.goods__cards').addEventListener('click', cartHandler);
+goodsCardsEl.addEventListener('click', cartHandler);
 
-document.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
+formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
