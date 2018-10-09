@@ -2,13 +2,14 @@
 
 (function () {
   var toggleTabsDelivery = function () {
-    var deliverStore = document.querySelector('.deliver__store');
-    var deliverCourier = document.querySelector('.deliver__courier');
-    var inputsStore = document.querySelectorAll('.deliver__store input');
-    var textArea = document.querySelectorAll('.deliver__courier textarea');
-    var inputsCourier = document.querySelectorAll('.deliver__courier input');
+    var deliverEl = document.querySelector('.deliver');
+    var deliverStore = deliverEl.querySelector('.deliver__store');
+    var deliverCourier = deliverEl.querySelector('.deliver__courier');
+    var inputsStore = deliverEl.querySelectorAll('.deliver__store input');
+    var textArea = deliverEl.querySelectorAll('.deliver__courier textarea');
+    var inputsCourier = deliverEl.querySelectorAll('.deliver__courier input');
 
-    document.querySelector('.deliver__toggle').addEventListener('click', function (evt) {
+    deliverEl.querySelector('.deliver__toggle').addEventListener('click', function (evt) {
       if (!evt.target.id) {
         return;
       }
@@ -25,12 +26,13 @@
   };
 
   var toggleTabsPayment = function () {
-    var paymentCard = document.querySelector('.payment__card-wrap');
-    var paymentCash = document.querySelector('.payment__cash-wrap');
-    var inputs = document.querySelectorAll('.payment__inputs input');
+    var paymentEl = document.querySelector('.payment');
+    var paymentCard = paymentEl.querySelector('.payment__card-wrap');
+    var paymentCash = paymentEl.querySelector('.payment__cash-wrap');
+    var inputs = paymentEl.querySelectorAll('.payment__inputs input');
 
 
-    document.querySelector('.payment__method').addEventListener('click', function (evt) {
+    paymentEl.querySelector('.payment__method').addEventListener('click', function (evt) {
       if (!evt.target.id) {
         return;
       }
