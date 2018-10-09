@@ -36,5 +36,26 @@
     }
   };
 
+  var upload = function (evt) {
+    if (!formEl.checkValidity()) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    var onLoad = function () {
+      window.modal.showModalSuccess();
+    };
+
+    var onError = function () {
+      window.modal.showModalError();
+    };
+
+    var data = new FormData(formEl);
+    window.upload(data, onLoad, onError);
+  };
+
   formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
+
+  formEl.addEventListener('submit', upload);
 })();

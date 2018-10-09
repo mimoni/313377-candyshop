@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var URL_GOODS = 'https://js.dump.academy/candyshop/data';
   var IMG_GOODS_PATH = './img/cards/';
   var cardCatalogTemplate = document.querySelector('#card')
     .content
@@ -41,7 +40,7 @@
       displayElements(goodsElements, catalogCardsEl);
     };
 
-    window.load(URL_GOODS, onSuccess, onError);
+    window.load(onSuccess, onError);
   };
 
   var getRatingClass = function (rating) {
