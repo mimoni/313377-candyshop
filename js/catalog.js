@@ -23,18 +23,35 @@
     'stars__rating--five'
   ];
 
+  var getItemCountFavoriteEl = function () {
+    return document.querySelector('#filter-favorite').nextElementSibling.nextElementSibling;
+  };
+
+  var updateItemCountFavorite = function () {
+    var counterEl = getItemCountFavoriteEl();
+    var favoriteCount = goods.filter(function (product) {
+      return product.favorite;
+    }).length;
+
+    counterEl.textContent = '(' + favoriteCount + ')';
+  };
+
   var loadGoods = function () {
     var onError = function () {
     };
 
     var onSuccess = function (data) {
-      goods = data;
-      window.catalog.goods = data;
+      goods = data.map(function (product) {
+        product.favorite = false;
+        return product;
+      });
+
+      window.catalog.goods = goods;
       hideCatalogLoadedText();
 
-      renderCatalogGoods(data);
+      renderCatalogGoods(goods);
 
-      window.updateCountsGoods(data);
+      window.updateCountsGoods(goods);
     };
 
     window.load(onSuccess, onError);
@@ -84,7 +101,7 @@
     var favoriteBtnElement = cardCatalogEl.querySelector('.card__btn-favorite');
     favoriteBtnElement.dataset.productName = item.name;
     if (item.favorite) {
-      cardCatalogEl.classList.add('.card__btn-favorite--selected');
+      favoriteBtnElement.classList.add('card__btn-favorite--selected');
     }
 
     cardCatalogEl.querySelector('.card__btn').dataset.productName = item.name;
@@ -153,6 +170,7 @@
       goodsCardsEl.classList.add('goods__cards--empty');
     }
 
+    updateItemCountFavorite();
     displayElements(goodsInCartElements, goodsCardsEl);
   };
 
@@ -205,6 +223,8 @@
         actionBtnElement.classList.add('card__btn-favorite--selected');
         product.favorite = true;
       }
+
+      updateItemCountFavorite();
     }
 
     //  Добавление товара в корзину

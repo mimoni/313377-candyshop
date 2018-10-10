@@ -57,6 +57,7 @@
 
     var idsFiltersFoodType = getIdsFilterByTypeAll('food-type');
     var idsFiltersFoodProperty = getIdsFilterByTypeAll('food-property');
+    idsFiltersFoodProperty.push('filter-availability');
     var idsForCount = idsFiltersFoodType.concat(idsFiltersFoodProperty);
 
     idsForCount.forEach(function (filterId) {
@@ -180,6 +181,14 @@
     return product.nutritionFacts.gluten === false;
   };
 
+  var isAvailability = function (product) {
+    return product.amount > 0;
+  };
+
+  var isFavorite = function (product) {
+    return product.favorite;
+  };
+
   var productKidFilter = function (kind) {
     return function (product) {
       return product.kind === kind;
@@ -256,14 +265,19 @@
     'filter-marshmallows': productKidFilter('Зефир'),
     'filter-expensive': sortDescendingPrice,
     'filter-cheep': sortAscendingPrice,
-    'filter-rating': sortByRating
+    'filter-rating': sortByRating,
+    'filter-availability': isAvailability,
+    'filter-favorite': isFavorite
   };
 
   var changeFilterHandler = function (evt) {
     var inputEl = evt.target;
 
     if (inputEl.name === 'mark') {
-      return;
+      var id = inputEl.id;
+      resetFilter();
+
+      formFilterEl.querySelector('#' + id).checked = true;
     }
 
     applyFilter();
@@ -288,6 +302,12 @@
     // Фильтрация по составу
     var idsFiltersFoodProperty = getIdsFilterByType('food-property');
     idsFiltersFoodProperty.forEach(function (idFilter) {
+      filteredGoods = filteredGoods.filter(goodsFilters[idFilter]);
+    });
+
+    // Фильтрация по наличию и в избранном
+    var idsFiltersMark = getIdsFilterByType('mark');
+    idsFiltersMark.forEach(function (idFilter) {
       filteredGoods = filteredGoods.filter(goodsFilters[idFilter]);
     });
 
