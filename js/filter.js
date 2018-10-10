@@ -104,12 +104,12 @@
         pin.style.left = newPositionPin + 'px';
         rangeFillLineEl.style.left = newPositionPin + 'px';
 
-        applyFilter();
+        debouncedApplyFilter();
       };
 
       var mouseUpHandler = function () {
         priceMinEl.textContent = getPriceFromRangeBtn(pin);
-        applyFilter();
+        debouncedApplyFilter();
 
         removeEvent(mouseUpHandler, mouseMoveHandler);
       };
@@ -141,7 +141,7 @@
         pin.style.left = newPositionPin + 'px';
         rangeFillLineEl.style.right = rangeWidth - newPositionPin + 'px';
 
-        applyFilter();
+        debouncedApplyFilter();
       };
 
       var mouseUpHandler = function () {
@@ -149,7 +149,7 @@
 
         removeEvent(mouseUpHandler, mouseMoveHandler);
 
-        applyFilter();
+        debouncedApplyFilter();
       };
 
       document.addEventListener('mouseup', mouseUpHandler);
@@ -280,7 +280,7 @@
       formFilterEl.querySelector('#' + id).checked = true;
     }
 
-    applyFilter();
+    debouncedApplyFilter();
   };
 
   var applyFilter = function () {
@@ -338,6 +338,8 @@
     }
   };
 
+  var debouncedApplyFilter = window.debounce(applyFilter);
+
   var resetFilter = function () {
     var inputs = formFilterEl.querySelectorAll('input');
     inputs.forEach(function (input) {
@@ -347,7 +349,7 @@
     filterPopularEl.checked = true;
 
     resetPriceSlider();
-    applyFilter();
+    debouncedApplyFilter();
   };
 
   var resetFilterHandler = function (evt) {
