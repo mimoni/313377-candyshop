@@ -4,6 +4,7 @@
   var formFilterEl = document.querySelector('.catalog__sidebar form');
   var filterPopularEl = formFilterEl.querySelector('#filter-popular');
   var resetFilterBtn = formFilterEl.querySelector('.catalog__submit');
+  var rangeCountEl = formFilterEl.querySelector('.range__count');
   var catalogCardsEl = document.querySelector('.catalog__cards-wrap');
   var maxPrice;
 
@@ -21,6 +22,42 @@
     if (emptyFilterMessage) {
       emptyFilterMessage.remove();
     }
+  };
+
+  var updateCount = function (countEl, count) {
+    countEl.textContent = '(' + count + ')';
+  };
+
+  var updateRangeCount = function (count) {
+    updateCount(rangeCountEl, count);
+  };
+
+  var setMaxPriceProduct = function (goods) {
+    var products = goods.slice();
+    var mostExpensiveProduct = products.sort(sortDescendingPrice)[0].price;
+    maxPrice = mostExpensiveProduct;
+    formFilterEl.querySelector('.range__price--max').textContent = mostExpensiveProduct;
+  };
+
+  var getItemCountElFromInputId = function (id) {
+    return formFilterEl.querySelector('#' + id).nextElementSibling.nextElementSibling;
+  };
+
+  var updateCountsGoods = function (goods) {
+    setMaxPriceProduct(goods);
+    updateRangeCount(goods.length);
+
+    var idsFiltersFoodType = getIdsFilterByTypeAll('food-type');
+    var idsFiltersFoodProperty = getIdsFilterByTypeAll('food-property');
+    var idsForCount = idsFiltersFoodType.concat(idsFiltersFoodProperty);
+
+    idsForCount.forEach(function (filterId) {
+      var filter = goodsFilters[filterId];
+      var count = goods.filter(filter).length;
+      var itemCountEl = getItemCountElFromInputId(filterId);
+
+      updateCount(itemCountEl, count);
+    });
   };
 
   var priceSlider = function () {
@@ -156,6 +193,19 @@
     return result;
   };
 
+  var getIdsFilterByTypeAll = function (foodType) {
+    var inputs = formFilterEl.querySelectorAll('input');
+    var result = [];
+
+    inputs.forEach(function (input) {
+      if (input.name === foodType) {
+        result.push(input.id);
+      }
+    });
+
+    return result;
+  };
+
   // Сортировка 'сначала дешёвые'
   var sortAscendingPrice = function (a, b) {
     return a.price - b.price;
@@ -176,7 +226,7 @@
     return b.rating.number - a.rating.number;
   };
 
-  var foodPropertyFilters = {
+  var goodsFilters = {
     'filter-sugar-free': isSugarFree,
     'filter-vegetarian': isVegetarian,
     'filter-gluten-free': isGlutenFree,
@@ -208,7 +258,7 @@
     // Фильтрация по виду товара
     idsFiltersFoodType.forEach(function (idFilter) {
       filteredGoods = filteredGoods.concat(
-          goods.filter(foodPropertyFilters[idFilter])
+         goods.filter(goodsFilters[idFilter])
       );
     });
 
@@ -219,16 +269,17 @@
     // Фильтрация по составу
     var idsFiltersFoodProperty = getIdsFilterByType('food-property');
     idsFiltersFoodProperty.forEach(function (idFilter) {
-      filteredGoods = filteredGoods.filter(foodPropertyFilters[idFilter]);
+      filteredGoods = filteredGoods.filter(goodsFilters[idFilter]);
     });
-
 
     // Сортировка
     var sortFunctionId = getIdsFilterByType('sort')[0];
     if (sortFunctionId !== 'filter-popular') {
-      var sortFunction = foodPropertyFilters[sortFunctionId];
+      var sortFunction = goodsFilters[sortFunctionId];
       filteredGoods.sort(sortFunction);
     }
+
+    updateRangeCount(filteredGoods.length);
 
     window.catalog.renderCatalogGoods(filteredGoods);
 
@@ -239,20 +290,28 @@
     }
   };
 
-  var resetFilterHandler = function (evt) {
-    evt.preventDefault();
-
+  var resetFilter = function () {
     var inputs = formFilterEl.querySelectorAll('input');
     inputs.forEach(function (input) {
       input.checked = false;
     });
 
     filterPopularEl.checked = true;
+
+    // resetPriceSlider();
     applyFilter();
+  };
+
+  var resetFilterHandler = function (evt) {
+    evt.preventDefault();
+
+    resetFilter();
   };
 
   priceSlider();
 
   formFilterEl.addEventListener('change', changeFilterHandler);
   resetFilterBtn.addEventListener('click', resetFilterHandler);
+
+  window.updateCountsGoods = updateCountsGoods;
 })();

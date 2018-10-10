@@ -33,6 +33,8 @@
       hideCatalogLoadedText();
 
       renderCatalogGoods(data);
+
+      window.updateCountsGoods(data);
     };
 
     window.load(onSuccess, onError);
