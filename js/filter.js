@@ -2,6 +2,22 @@
 
 (function () {
   var rangeEl = document.querySelector('.range');
+  var formFilterEl = document.querySelector('.catalog__sidebar form');
+  var catalogCardspEl = document.querySelector('.catalog__cards-wrap');
+
+  var emptyFiltersTemplate = document.querySelector('#empty-filters')
+    .content
+    .querySelector('.catalog__empty-filter');
+
+  var showEmptyFilterMessage = function () {
+    catalogCardspEl.appendChild(emptyFiltersTemplate);
+  };
+
+  var removeEmptyFilterMessage = function () {
+    var emptyFilterMessage = catalogCardspEl.querySelector('.catalog__empty-filter')
+
+    emptyFilterMessage && emptyFilterMessage.remove();
+  };
 
   var priceSlider = function () {
     var maxPrice = 100;
@@ -89,4 +105,118 @@
   };
 
   priceSlider();
+
+  // filter functions
+  var isSugarFree = function (product) {
+    return product.nutritionFacts.sugar === false;
+  };
+
+  var isVegetarian = function (product) {
+    return product.nutritionFacts.vegetarian;
+  };
+
+  var isGlutenFree = function (product) {
+    return product.nutritionFacts.gluten === false;
+  };
+
+  var isAvailability = function (product) {
+    return product.amount > 0;
+  };
+
+  var productKidFilter = function (kind) {
+    return function (product) {
+      return product.kind === kind;
+    };
+  };
+
+  var stubSort = function () {
+    return true;
+  };
+
+  var getCheckedInputs = function () {
+    var inputs = formFilterEl.querySelectorAll('input');
+    var checkedInputsIds = [];
+
+    inputs.forEach(function (input) {
+      if (input.checked) {
+        checkedInputsIds.push(input);
+      }
+    });
+
+    return checkedInputsIds;
+  };
+
+  var getIdsFilterByType = function (foodType) {
+    var inputs = getCheckedInputs();
+    var result = [];
+
+    inputs.forEach(function (input) {
+      if (input.name === foodType) {
+        result.push(input.id);
+      }
+    });
+
+    return result;
+  };
+
+  var foodPropertyFilters = {
+    'filter-sugar-free': isSugarFree,
+    'filter-vegetarian': isVegetarian,
+    'filter-gluten-free': isGlutenFree,
+    'filter-icecream': productKidFilter('Мороженое'),
+    'filter-soda': productKidFilter('Газировка'),
+    'filter-gum': productKidFilter('Жевательная резинка'),
+    'filter-marmalade': productKidFilter('Мармелад'),
+    'filter-marshmallows': productKidFilter('Зефир'),
+    // 'filter-availability': isAvailability,
+    // 'filter-popular': stubSort,
+    // 'filter-expensive': stubSort,
+    // 'filter-cheep': stubSort,
+    // 'filter-rating': stubSort
+  };
+
+  var changeFilterHandler = function (evt) {
+    var inputEl = evt.target;
+
+    if (inputEl.name === 'mark') {
+      console.log('type mark >>>>>>>>>>>>> exit');
+      return;
+    }
+
+    var goods = window.catalog.goods.slice();
+    var idsFiltersFoodType = getIdsFilterByType('food-type');
+    var filteredGoods = [];
+
+    // Фильтрация по виду товара
+    idsFiltersFoodType.forEach(function (idFilter) {
+      filteredGoods = filteredGoods.concat(
+          goods.filter(foodPropertyFilters[idFilter])
+      );
+    });
+
+    if (idsFiltersFoodType.length === 0) {
+      filteredGoods = goods;
+    }
+
+    // Фильтрация по составу
+    var idsFiltersFoodProperty = getIdsFilterByType('food-property');
+    idsFiltersFoodProperty.forEach(function (idFilter) {
+      filteredGoods = filteredGoods.filter(foodPropertyFilters[idFilter]);
+    });
+
+
+    console.log(idsFiltersFoodType);
+    console.log(idsFiltersFoodProperty);
+    console.log(filteredGoods);
+
+    window.catalog.renderCatalogGoods(filteredGoods);
+
+    if (filteredGoods.length) {
+      removeEmptyFilterMessage();
+    } else {
+      showEmptyFilterMessage();
+    }
+  };
+
+  formFilterEl.addEventListener('change', changeFilterHandler);
 })();
