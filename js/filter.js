@@ -4,7 +4,15 @@
   var formFilterEl = document.querySelector('.catalog__sidebar form');
   var filterPopularEl = formFilterEl.querySelector('#filter-popular');
   var resetFilterBtn = formFilterEl.querySelector('.catalog__submit');
+
   var rangeCountEl = formFilterEl.querySelector('.range__count');
+  var priceMinEl = formFilterEl.querySelector('.range__price--min');
+  var priceMaxEl = formFilterEl.querySelector('.range__price--max');
+  var rangeWidth = formFilterEl.querySelector('.range__filter').offsetWidth;
+  var rangePinLeftEl = formFilterEl.querySelector('.range__btn--left');
+  var rangePinRightEl = formFilterEl.querySelector('.range__btn--right');
+  var rangeFillLineEl = formFilterEl.querySelector('.range__fill-line');
+
   var catalogCardsEl = document.querySelector('.catalog__cards-wrap');
   var maxPrice;
 
@@ -36,7 +44,7 @@
     var products = goods.slice();
     var mostExpensiveProduct = products.sort(sortDescendingPrice)[0].price;
     maxPrice = mostExpensiveProduct;
-    formFilterEl.querySelector('.range__price--max').textContent = mostExpensiveProduct;
+    priceMaxEl.textContent = mostExpensiveProduct;
   };
 
   var getItemCountElFromInputId = function (id) {
@@ -62,14 +70,8 @@
 
   var priceSlider = function () {
     var minXPosition = 0;
-    var rangeWidth = formFilterEl.querySelector('.range__filter').offsetWidth;
-    var priceMinEl = formFilterEl.querySelector('.range__price--min');
-    var priceMaxEl = formFilterEl.querySelector('.range__price--max');
-    var rangePinLeftEl = formFilterEl.querySelector('.range__btn--left');
-    var rangePinRightEl = formFilterEl.querySelector('.range__btn--right');
     var pinWidth = rangePinLeftEl.offsetWidth;
-    var rangeFillLineEl = formFilterEl.querySelector('.range__fill-line');
-    var getPercentFromRangeBtn = function (el) {
+    var getPriceFromRangeBtn = function (el) {
       var percent = parseFloat(el.style.left) * 100 / rangeWidth;
       return Math.round(maxPrice * percent / 100);
     };
@@ -86,7 +88,7 @@
       var shiftX = evt.clientX - parseInt(pin.style.left, 10);
 
       var mouseMoveHandler = function (moveEvt) {
-        priceMinEl.textContent = getPercentFromRangeBtn(pin);
+        priceMinEl.textContent = getPriceFromRangeBtn(pin);
         var newPositionPin = moveEvt.clientX - shiftX;
 
         if (newPositionPin < minXPosition) {
@@ -100,10 +102,14 @@
 
         pin.style.left = newPositionPin + 'px';
         rangeFillLineEl.style.left = newPositionPin + 'px';
+
+        applyFilter();
       };
 
       var mouseUpHandler = function () {
-        priceMinEl.textContent = getPercentFromRangeBtn(pin);
+        priceMinEl.textContent = getPriceFromRangeBtn(pin);
+        applyFilter();
+
         removeEvent(mouseUpHandler, mouseMoveHandler);
       };
 
@@ -118,7 +124,8 @@
       var shiftX = evt.clientX - parseInt(pin.style.left, 10);
 
       var mouseMoveHandler = function (moveEvt) {
-        priceMaxEl.textContent = getPercentFromRangeBtn(pin);
+        priceMaxEl.textContent = getPriceFromRangeBtn(pin);
+
         var newPositionPin = moveEvt.clientX - shiftX;
 
         if (newPositionPin > rangeWidth) {
@@ -132,11 +139,16 @@
 
         pin.style.left = newPositionPin + 'px';
         rangeFillLineEl.style.right = rangeWidth - newPositionPin + 'px';
+
+        applyFilter();
       };
 
       var mouseUpHandler = function () {
-        priceMaxEl.textContent = getPercentFromRangeBtn(pin);
+        priceMaxEl.textContent = getPriceFromRangeBtn(pin);
+
         removeEvent(mouseUpHandler, mouseMoveHandler);
+
+        applyFilter();
       };
 
       document.addEventListener('mouseup', mouseUpHandler);
@@ -144,9 +156,16 @@
     });
   };
 
-  // var resetPriceSlider = function () {
-  //
-  // };
+  var resetPriceSlider = function () {
+    priceMinEl.textContent = 0;
+    priceMaxEl.textContent = maxPrice;
+
+    rangePinLeftEl.style.left = 0 + 'px';
+    rangePinRightEl.style.left = rangeWidth + 'px';
+
+    rangeFillLineEl.style.left = 0 + 'px';
+    rangeFillLineEl.style.right = 0 + 'px';
+  };
 
   // filter functions
   var isSugarFree = function (product) {
@@ -258,7 +277,7 @@
     // Фильтрация по виду товара
     idsFiltersFoodType.forEach(function (idFilter) {
       filteredGoods = filteredGoods.concat(
-         goods.filter(goodsFilters[idFilter])
+          goods.filter(goodsFilters[idFilter])
       );
     });
 
@@ -279,6 +298,15 @@
       filteredGoods.sort(sortFunction);
     }
 
+    // Фильтрация по цене
+    var priceMax = parseInt(priceMaxEl.textContent, 10);
+    var priceMin = parseInt(priceMinEl.textContent, 10);
+
+    filteredGoods = filteredGoods.filter(function (product) {
+      var price = product.price;
+      return (price >= priceMin) && (price <= priceMax);
+    });
+
     updateRangeCount(filteredGoods.length);
 
     window.catalog.renderCatalogGoods(filteredGoods);
@@ -298,7 +326,7 @@
 
     filterPopularEl.checked = true;
 
-    // resetPriceSlider();
+    resetPriceSlider();
     applyFilter();
   };
 
