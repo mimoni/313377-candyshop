@@ -1,34 +1,37 @@
 'use strict';
 
 (function () {
-  var rangeEl = document.querySelector('.range');
   var formFilterEl = document.querySelector('.catalog__sidebar form');
-  var catalogCardspEl = document.querySelector('.catalog__cards-wrap');
+  var filterPopularEl = formFilterEl.querySelector('#filter-popular');
+  var resetFilterBtn = formFilterEl.querySelector('.catalog__submit');
+  var catalogCardsEl = document.querySelector('.catalog__cards-wrap');
+  var maxPrice;
 
   var emptyFiltersTemplate = document.querySelector('#empty-filters')
     .content
     .querySelector('.catalog__empty-filter');
 
   var showEmptyFilterMessage = function () {
-    catalogCardspEl.appendChild(emptyFiltersTemplate);
+    catalogCardsEl.appendChild(emptyFiltersTemplate);
   };
 
   var removeEmptyFilterMessage = function () {
-    var emptyFilterMessage = catalogCardspEl.querySelector('.catalog__empty-filter')
+    var emptyFilterMessage = catalogCardsEl.querySelector('.catalog__empty-filter');
 
-    emptyFilterMessage && emptyFilterMessage.remove();
+    if (emptyFilterMessage) {
+      emptyFilterMessage.remove();
+    }
   };
 
   var priceSlider = function () {
-    var maxPrice = 100;
     var minXPosition = 0;
-    var rangeWidth = rangeEl.querySelector('.range__filter').offsetWidth;
-    var priceMinEl = rangeEl.querySelector('.range__price--min');
-    var priceMaxEl = rangeEl.querySelector('.range__price--max');
-    var rangePinLeftEl = rangeEl.querySelector('.range__btn--left');
-    var rangePinRightEl = rangeEl.querySelector('.range__btn--right');
+    var rangeWidth = formFilterEl.querySelector('.range__filter').offsetWidth;
+    var priceMinEl = formFilterEl.querySelector('.range__price--min');
+    var priceMaxEl = formFilterEl.querySelector('.range__price--max');
+    var rangePinLeftEl = formFilterEl.querySelector('.range__btn--left');
+    var rangePinRightEl = formFilterEl.querySelector('.range__btn--right');
     var pinWidth = rangePinLeftEl.offsetWidth;
-    var rangeFillLineEl = rangeEl.querySelector('.range__fill-line');
+    var rangeFillLineEl = formFilterEl.querySelector('.range__fill-line');
     var getPercentFromRangeBtn = function (el) {
       var percent = parseFloat(el.style.left) * 100 / rangeWidth;
       return Math.round(maxPrice * percent / 100);
@@ -104,7 +107,9 @@
     });
   };
 
-  priceSlider();
+  // var resetPriceSlider = function () {
+  //
+  // };
 
   // filter functions
   var isSugarFree = function (product) {
@@ -119,18 +124,10 @@
     return product.nutritionFacts.gluten === false;
   };
 
-  var isAvailability = function (product) {
-    return product.amount > 0;
-  };
-
   var productKidFilter = function (kind) {
     return function (product) {
       return product.kind === kind;
     };
-  };
-
-  var stubSort = function () {
-    return true;
   };
 
   var getCheckedInputs = function () {
@@ -159,6 +156,26 @@
     return result;
   };
 
+  // Сортировка 'сначала дешёвые'
+  var sortAscendingPrice = function (a, b) {
+    return a.price - b.price;
+  };
+
+  // Сортировка 'сначала дорогие'
+  var sortDescendingPrice = function (a, b) {
+    return b.price - a.price;
+  };
+
+  // Сортировкапо рейтингу
+  var sortByRating = function (a, b) {
+    var ratingValue = b.rating.value - a.rating.value;
+    if (ratingValue !== 0) {
+      return ratingValue;
+    }
+
+    return b.rating.number - a.rating.number;
+  };
+
   var foodPropertyFilters = {
     'filter-sugar-free': isSugarFree,
     'filter-vegetarian': isVegetarian,
@@ -168,21 +185,22 @@
     'filter-gum': productKidFilter('Жевательная резинка'),
     'filter-marmalade': productKidFilter('Мармелад'),
     'filter-marshmallows': productKidFilter('Зефир'),
-    // 'filter-availability': isAvailability,
-    // 'filter-popular': stubSort,
-    // 'filter-expensive': stubSort,
-    // 'filter-cheep': stubSort,
-    // 'filter-rating': stubSort
+    'filter-expensive': sortDescendingPrice,
+    'filter-cheep': sortAscendingPrice,
+    'filter-rating': sortByRating
   };
 
   var changeFilterHandler = function (evt) {
     var inputEl = evt.target;
 
     if (inputEl.name === 'mark') {
-      console.log('type mark >>>>>>>>>>>>> exit');
       return;
     }
 
+    applyFilter();
+  };
+
+  var applyFilter = function () {
     var goods = window.catalog.goods.slice();
     var idsFiltersFoodType = getIdsFilterByType('food-type');
     var filteredGoods = [];
@@ -205,9 +223,12 @@
     });
 
 
-    console.log(idsFiltersFoodType);
-    console.log(idsFiltersFoodProperty);
-    console.log(filteredGoods);
+    // Сортировка
+    var sortFunctionId = getIdsFilterByType('sort')[0];
+    if (sortFunctionId !== 'filter-popular') {
+      var sortFunction = foodPropertyFilters[sortFunctionId];
+      filteredGoods.sort(sortFunction);
+    }
 
     window.catalog.renderCatalogGoods(filteredGoods);
 
@@ -218,5 +239,20 @@
     }
   };
 
+  var resetFilterHandler = function (evt) {
+    evt.preventDefault();
+
+    var inputs = formFilterEl.querySelectorAll('input');
+    inputs.forEach(function (input) {
+      input.checked = false;
+    });
+
+    filterPopularEl.checked = true;
+    applyFilter();
+  };
+
+  priceSlider();
+
   formFilterEl.addEventListener('change', changeFilterHandler);
+  resetFilterBtn.addEventListener('click', resetFilterHandler);
 })();
