@@ -206,7 +206,7 @@
     }
   };
 
-  var productHandler = function (evt) {
+  var productClickHandler = function (evt) {
     var actionBtnElement = evt.target;
 
     // Добавление/удаление в избранное
@@ -237,7 +237,7 @@
     }
   };
 
-  var cartHandler = function (evt) {
+  var cartClickHandler = function (evt) {
     var actionBtnElement = evt.target;
     var productName = actionBtnElement.dataset.productName;
 
@@ -281,9 +281,9 @@
 
   loadGoods();
 
-  catalogCardsEl.addEventListener('click', productHandler);
+  catalogCardsEl.addEventListener('click', productClickHandler);
 
-  goodsCardsEl.addEventListener('click', cartHandler);
+  goodsCardsEl.addEventListener('click', cartClickHandler);
 
   window.catalog = {
     renderCatalogGoods: renderCatalogGoods

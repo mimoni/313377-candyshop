@@ -21,7 +21,7 @@
     return sum % 10 === 0;
   };
 
-  var cardNumberHandler = function (evt) {
+  var cardNumberInputHandler = function (evt) {
     var cardInput = evt.target;
 
     if (cardInput.value.length !== 16) {
@@ -36,7 +36,7 @@
     }
   };
 
-  var upload = function (evt) {
+  var btnSubmitHandler = function (evt) {
     if (!formEl.checkValidity()) {
       return;
     }
@@ -55,7 +55,7 @@
     window.upload(data, onLoad, onError);
   };
 
-  formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
+  formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberInputHandler);
 
-  formEl.addEventListener('submit', upload);
+  formEl.addEventListener('submit', btnSubmitHandler);
 })();

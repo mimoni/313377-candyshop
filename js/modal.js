@@ -19,10 +19,10 @@
 
     var closeModal = function () {
       modalEl.classList.add('modal--hidden');
-      document.removeEventListener('keydown', keyDownModalHandler);
+      document.removeEventListener('keydown', modalKeyDownHandler);
     };
 
-    var keyDownModalHandler = function (evt) {
+    var modalKeyDownHandler = function (evt) {
       evt.preventDefault();
 
       if (evt.keyCode === ESC_KEYCODE) {
@@ -30,12 +30,12 @@
       }
     };
 
-    var clickModalHandler = function () {
+    var modalClickHandler = function () {
       closeModal();
     };
 
-    closeBtn.addEventListener('click', clickModalHandler);
-    document.addEventListener('keydown', keyDownModalHandler);
+    closeBtn.addEventListener('click', modalClickHandler);
+    document.addEventListener('keydown', modalKeyDownHandler);
   };
 
   window.modal = {

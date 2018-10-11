@@ -270,7 +270,7 @@
     'filter-favorite': isFavorite
   };
 
-  var changeFilterHandler = function (evt) {
+  var filterChangeHandler = function (evt) {
     var inputEl = evt.target;
 
     if (inputEl.name === 'mark') {
@@ -352,7 +352,7 @@
     debouncedApplyFilter();
   };
 
-  var resetFilterHandler = function (evt) {
+  var filterResetClickHandler = function (evt) {
     evt.preventDefault();
 
     resetFilter();
@@ -360,8 +360,8 @@
 
   priceSlider();
 
-  formFilterEl.addEventListener('change', changeFilterHandler);
-  resetFilterBtn.addEventListener('click', resetFilterHandler);
+  formFilterEl.addEventListener('change', filterChangeHandler);
+  resetFilterBtn.addEventListener('click', filterResetClickHandler);
 
   window.updateCountsGoods = updateCountsGoods;
 })();
