@@ -23,21 +23,35 @@
     'stars__rating--five'
   ];
 
+  var getItemCountFavoriteEl = function () {
+    return document.querySelector('#filter-favorite').nextElementSibling.nextElementSibling;
+  };
+
+  var updateItemCountFavorite = function () {
+    var counterEl = getItemCountFavoriteEl();
+    var favoriteCount = goods.filter(function (product) {
+      return product.favorite;
+    }).length;
+
+    counterEl.textContent = '(' + favoriteCount + ')';
+  };
+
   var loadGoods = function () {
     var onError = function () {
     };
 
     var onSuccess = function (data) {
-      goods = data;
-      hideCatalogLoadedText();
-
-      var goodsElements = [];
-
-      goods.forEach(function (product) {
-        goodsElements.push(renderCatalogCard(product));
+      goods = data.map(function (product) {
+        product.favorite = false;
+        return product;
       });
 
-      displayElements(goodsElements, catalogCardsEl);
+      window.catalog.goods = goods;
+      hideCatalogLoadedText();
+
+      renderCatalogGoods(goods);
+
+      window.updateCountsGoods(goods);
     };
 
     window.load(onSuccess, onError);
@@ -47,7 +61,19 @@
     return ratingClassList[rating - 1];
   };
 
-  var renderCatalogCard = function (item) {
+  var renderCatalogGoods = function (catalogGoods) {
+    var goodsElements = [];
+
+    removeAllElements('.catalog__card');
+
+    catalogGoods.forEach(function (product) {
+      goodsElements.push(renderCard(product));
+    });
+
+    displayElements(goodsElements, catalogCardsEl);
+  };
+
+  var renderCard = function (item) {
     var cardCatalogEl = cardCatalogTemplate.cloneNode(true);
     var amountClass = '';
 
@@ -75,7 +101,7 @@
     var favoriteBtnElement = cardCatalogEl.querySelector('.card__btn-favorite');
     favoriteBtnElement.dataset.productName = item.name;
     if (item.favorite) {
-      cardCatalogEl.classList.add('.card__btn-favorite--selected');
+      favoriteBtnElement.classList.add('card__btn-favorite--selected');
     }
 
     cardCatalogEl.querySelector('.card__btn').dataset.productName = item.name;
@@ -133,9 +159,7 @@
     }
 
     // перед отображением корзины удалить все карточки из неё
-    document.querySelectorAll('.goods_card').forEach(function (goodsCard) {
-      goodsCard.remove();
-    });
+    removeAllElements('.goods_card');
 
     // Если в корзине есть товары, убрать сообщение о пустой корзине
     if (Object.keys(goodsInCart).length) {
@@ -146,7 +170,14 @@
       goodsCardsEl.classList.add('goods__cards--empty');
     }
 
+    updateItemCountFavorite();
     displayElements(goodsInCartElements, goodsCardsEl);
+  };
+
+  var removeAllElements = function (classEl) {
+    document.querySelectorAll(classEl).forEach(function (element) {
+      element.remove();
+    });
   };
 
   var addProductToCart = function (name) {
@@ -175,7 +206,7 @@
     }
   };
 
-  var productHandler = function (evt) {
+  var productClickHandler = function (evt) {
     var actionBtnElement = evt.target;
 
     // Добавление/удаление в избранное
@@ -192,6 +223,8 @@
         actionBtnElement.classList.add('card__btn-favorite--selected');
         product.favorite = true;
       }
+
+      updateItemCountFavorite();
     }
 
     //  Добавление товара в корзину
@@ -204,7 +237,7 @@
     }
   };
 
-  var cartHandler = function (evt) {
+  var cartClickHandler = function (evt) {
     var actionBtnElement = evt.target;
     var productName = actionBtnElement.dataset.productName;
 
@@ -248,7 +281,11 @@
 
   loadGoods();
 
-  catalogCardsEl.addEventListener('click', productHandler);
+  catalogCardsEl.addEventListener('click', productClickHandler);
 
-  goodsCardsEl.addEventListener('click', cartHandler);
+  goodsCardsEl.addEventListener('click', cartClickHandler);
+
+  window.catalog = {
+    renderCatalogGoods: renderCatalogGoods
+  };
 })();

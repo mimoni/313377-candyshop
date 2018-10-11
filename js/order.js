@@ -1,7 +1,11 @@
 'use strict';
 
 (function () {
+  var IMG_PATH = 'img/map/';
   var formEl = document.querySelector('.buy form');
+  var paymentStatusEl = formEl.querySelector('.payment__card-status');
+  var inputsStoreEl = formEl.querySelectorAll('input[name="store"]');
+  var storeMapImgEl = formEl.querySelector('.deliver__store-map-img');
 
   var checkCardNumber = function (inputValue) {
     var numbers = inputValue.split('').map(function (char, index) {
@@ -21,8 +25,9 @@
     return sum % 10 === 0;
   };
 
-  var cardNumberHandler = function (evt) {
+  var cardNumberInputHandler = function (evt) {
     var cardInput = evt.target;
+    var paymentStatus = 'Не определён';
 
     if (cardInput.value.length !== 16) {
       cardInput.setCustomValidity('Номер карты должен состоять из 16 символов');
@@ -31,12 +36,15 @@
 
     if (checkCardNumber(cardInput.value)) {
       cardInput.setCustomValidity('');
+      paymentStatus = 'Одобрен';
     } else {
       cardInput.setCustomValidity('Неверный номер кредитной карты');
     }
+
+    paymentStatusEl.textContent = paymentStatus;
   };
 
-  var upload = function (evt) {
+  var btnSubmitHandler = function (evt) {
     if (!formEl.checkValidity()) {
       return;
     }
@@ -55,7 +63,16 @@
     window.upload(data, onLoad, onError);
   };
 
-  formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberHandler);
+  var inputStoreClickHandler = function (evt) {
+    var imageName = evt.target.value;
+    storeMapImgEl.src = IMG_PATH + imageName + '.jpg';
+  };
 
-  formEl.addEventListener('submit', upload);
+  formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberInputHandler);
+
+  formEl.addEventListener('submit', btnSubmitHandler);
+
+  inputsStoreEl.forEach(function (input) {
+    input.addEventListener('click', inputStoreClickHandler);
+  });
 })();
