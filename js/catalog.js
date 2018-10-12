@@ -13,7 +13,7 @@
   var headerBasket = document.querySelector('.main-header__basket');
   var catalogCardsEl = document.querySelector('.catalog__cards');
   var goodsCardsEl = document.querySelector('.goods__cards');
-  var formInputs = document.querySelectorAll('input, textarea, button');
+  var formInputs = document.querySelectorAll('.buy input, .buy textarea, .buy button');
   var goodsInCart = {};
   var goods = [];
   var ratingClassList = [
