@@ -13,6 +13,7 @@
   var headerBasket = document.querySelector('.main-header__basket');
   var catalogCardsEl = document.querySelector('.catalog__cards');
   var goodsCardsEl = document.querySelector('.goods__cards');
+  var formInputs = document.querySelectorAll('.buy input, .buy textarea, .buy button');
   var goodsInCart = {};
   var goods = [];
   var ratingClassList = [
@@ -38,6 +39,7 @@
 
   var loadGoods = function () {
     var onError = function () {
+      window.modal.showModalError();
     };
 
     var onSuccess = function (data) {
@@ -165,13 +167,30 @@
     if (Object.keys(goodsInCart).length) {
       goodsCardsEl.querySelector('.goods__card-empty').classList.add('visually-hidden');
       goodsCardsEl.classList.remove('goods__cards--empty');
+
+      enableAllInputsForm();
+      window.disableHiddenInputs();
     } else {
       goodsCardsEl.querySelector('.goods__card-empty').classList.remove('visually-hidden');
       goodsCardsEl.classList.add('goods__cards--empty');
+
+      disableAllInputsForm();
     }
 
     updateItemCountFavorite();
     displayElements(goodsInCartElements, goodsCardsEl);
+  };
+
+  var disableAllInputsForm = function () {
+    formInputs.forEach(function (input) {
+      input.disabled = true;
+    });
+  };
+
+  var enableAllInputsForm = function () {
+    formInputs.forEach(function (input) {
+      input.disabled = false;
+    });
   };
 
   var removeAllElements = function (classEl) {
@@ -284,6 +303,8 @@
   catalogCardsEl.addEventListener('click', productClickHandler);
 
   goodsCardsEl.addEventListener('click', cartClickHandler);
+
+  disableAllInputsForm();
 
   window.catalog = {
     renderCatalogGoods: renderCatalogGoods

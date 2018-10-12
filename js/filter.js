@@ -274,10 +274,11 @@
     var inputEl = evt.target;
 
     if (inputEl.name === 'mark') {
-      var id = inputEl.id;
-      resetFilter();
+      var inputMarkEl = formFilterEl.querySelector('#' + inputEl.id);
+      var checkedInput = inputMarkEl.checked;
 
-      formFilterEl.querySelector('#' + id).checked = true;
+      resetFilter();
+      inputMarkEl.checked = checkedInput;
     }
 
     debouncedApplyFilter();
