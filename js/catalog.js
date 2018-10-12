@@ -39,6 +39,7 @@
 
   var loadGoods = function () {
     var onError = function () {
+      window.modal.showModalError();
     };
 
     var onSuccess = function (data) {
