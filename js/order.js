@@ -4,6 +4,7 @@
   var IMG_PATH = 'img/map/';
   var formEl = document.querySelector('.buy form');
   var paymentStatusEl = formEl.querySelector('.payment__card-status');
+  var paymentInputsEl = formEl.querySelectorAll('.payment__inputs input');
   var inputsStoreEl = formEl.querySelectorAll('input[name="store"]');
   var storeMapImgEl = formEl.querySelector('.deliver__store-map-img');
 
@@ -27,7 +28,6 @@
 
   var cardNumberInputHandler = function (evt) {
     var cardInput = evt.target;
-    var paymentStatus = 'Не определён';
 
     if (cardInput.value.length !== 16) {
       cardInput.setCustomValidity('Номер карты должен состоять из 16 символов');
@@ -36,12 +36,33 @@
 
     if (checkCardNumber(cardInput.value)) {
       cardInput.setCustomValidity('');
-      paymentStatus = 'Одобрен';
     } else {
       cardInput.setCustomValidity('Неверный номер кредитной карты');
     }
+  };
+
+  var checkCardInputsStatus = function () {
+    var paymentStatus = 'Не определён';
+    var inputsEl = [];
+    paymentInputsEl.forEach(function (input) {
+      inputsEl.push(input);
+    });
+
+    var statusCard = inputsEl.every(function (input) {
+      return input.checkValidity();
+    });
+
+    if (statusCard) {
+      paymentStatus = 'Одобрен';
+    } else {
+      paymentStatus = 'Не определён';
+    }
 
     paymentStatusEl.textContent = paymentStatus;
+  };
+
+  var paymentFieldsInputHandler = function () {
+    checkCardInputsStatus();
   };
 
   var btnSubmitHandler = function (evt) {
@@ -71,6 +92,10 @@
   formEl.querySelector('#payment__card-number').addEventListener('input', cardNumberInputHandler);
 
   formEl.addEventListener('submit', btnSubmitHandler);
+
+  paymentInputsEl.forEach(function (input) {
+    input.addEventListener('input', paymentFieldsInputHandler);
+  });
 
   inputsStoreEl.forEach(function (input) {
     input.addEventListener('click', inputStoreClickHandler);
