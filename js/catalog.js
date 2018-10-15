@@ -15,7 +15,7 @@
   var goodsCardsEl = document.querySelector('.goods__cards');
   var formInputs = document.querySelectorAll('.buy input, .buy textarea, .buy button');
   var goodsInCart = {};
-  var goods = [];
+  var goods;
   var ratingClassList = [
     'stars__rating--one',
     'stars__rating--two',
@@ -43,17 +43,19 @@
     };
 
     var loadDataHandler = function (data) {
-      goods = data.map(function (product) {
+      var products = data.map(function (product) {
         product.favorite = false;
         return product;
       });
 
-      window.catalog.goods = goods;
+      // window.catalog.goods будет равено undefined если здесь не присвоить через window
+      window.catalog.goods = products;
+
       hideCatalogLoadedText();
 
-      renderCatalogGoods(goods);
+      renderCatalogGoods(products);
 
-      window.updateCountsGoods(goods);
+      window.filter.updateCountsGoods(products);
     };
 
     window.backend.load(loadDataHandler, errorHandler);
@@ -169,7 +171,7 @@
       goodsCardsEl.classList.remove('goods__cards--empty');
 
       enableAllInputsForm();
-      window.disableHiddenInputs();
+      window.toggleTabs.disableHiddenInputs();
     } else {
       goodsCardsEl.querySelector('.goods__card-empty').classList.remove('visually-hidden');
       goodsCardsEl.classList.add('goods__cards--empty');

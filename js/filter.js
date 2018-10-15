@@ -364,5 +364,7 @@
   formFilterEl.addEventListener('change', filterChangeHandler);
   resetFilterBtn.addEventListener('click', filterResetClickHandler);
 
-  window.updateCountsGoods = updateCountsGoods;
+  window.filter = {
+    updateCountsGoods: updateCountsGoods
+  };
 })();

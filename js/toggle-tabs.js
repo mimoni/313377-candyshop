@@ -77,5 +77,7 @@
   toggleTabsDelivery();
   toggleTabsPayment();
 
-  window.disableHiddenInputs = disableHiddenInputs;
+  window.toggleTabs = {
+    disableHiddenInputs: disableHiddenInputs
+  };
 })();
