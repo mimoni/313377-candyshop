@@ -69,7 +69,7 @@
     });
   };
 
-  var priceSlider = function () {
+  var setPriceSlider = function () {
     var minXPosition = 0;
     var pinWidth = rangePinLeftEl.offsetWidth;
     var getPriceFromRangeBtn = function (el) {
@@ -189,7 +189,7 @@
     return product.favorite;
   };
 
-  var productKidFilter = function (kind) {
+  var getProductByKidFilter = function (kind) {
     return function (product) {
       return product.kind === kind;
     };
@@ -258,11 +258,11 @@
     'filter-sugar-free': isSugarFree,
     'filter-vegetarian': isVegetarian,
     'filter-gluten-free': isGlutenFree,
-    'filter-icecream': productKidFilter('Мороженое'),
-    'filter-soda': productKidFilter('Газировка'),
-    'filter-gum': productKidFilter('Жевательная резинка'),
-    'filter-marmalade': productKidFilter('Мармелад'),
-    'filter-marshmallows': productKidFilter('Зефир'),
+    'filter-icecream': getProductByKidFilter('Мороженое'),
+    'filter-soda': getProductByKidFilter('Газировка'),
+    'filter-gum': getProductByKidFilter('Жевательная резинка'),
+    'filter-marmalade': getProductByKidFilter('Мармелад'),
+    'filter-marshmallows': getProductByKidFilter('Зефир'),
     'filter-expensive': sortDescendingPrice,
     'filter-cheep': sortAscendingPrice,
     'filter-rating': sortByRating,
@@ -359,7 +359,7 @@
     resetFilter();
   };
 
-  priceSlider();
+  setPriceSlider();
 
   formFilterEl.addEventListener('change', filterChangeHandler);
   resetFilterBtn.addEventListener('click', filterResetClickHandler);

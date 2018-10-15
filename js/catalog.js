@@ -51,6 +51,8 @@
       // window.catalog.goods будет равено undefined если здесь не присвоить через window
       window.catalog.goods = products;
 
+      goods = products;
+
       hideCatalogLoadedText();
 
       renderCatalogGoods(products);
