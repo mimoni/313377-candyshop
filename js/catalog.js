@@ -38,11 +38,11 @@
   };
 
   var loadGoods = function () {
-    var onError = function () {
+    var errorHandler = function () {
       window.modal.showModalError();
     };
 
-    var onSuccess = function (data) {
+    var loadDataHandler = function (data) {
       goods = data.map(function (product) {
         product.favorite = false;
         return product;
@@ -56,7 +56,7 @@
       window.updateCountsGoods(goods);
     };
 
-    window.load(onSuccess, onError);
+    window.backend.load(loadDataHandler, errorHandler);
   };
 
   var getRatingClass = function (rating) {

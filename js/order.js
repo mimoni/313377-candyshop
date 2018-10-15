@@ -51,16 +51,16 @@
 
     evt.preventDefault();
 
-    var onLoad = function () {
+    var loadHandler = function () {
       window.modal.showModalSuccess();
     };
 
-    var onError = function () {
+    var errorHandler = function () {
       window.modal.showModalError();
     };
 
     var data = new FormData(formEl);
-    window.upload(data, onLoad, onError);
+    window.backend.upload(data, loadHandler, errorHandler);
   };
 
   var inputStoreClickHandler = function (evt) {
